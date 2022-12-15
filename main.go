@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+func routes() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
@@ -22,7 +22,12 @@ func main() {
 			"title": "User Login",
 		})
 	})
-	// define port `r.Run(":8080")`
+
 	fmt.Println("server started on :8080")
+	// define port `r.Run(":8080")`
 	log.Fatal(router.Run(":8080"))
+}
+
+func main() {
+	routes()
 }
