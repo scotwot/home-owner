@@ -1,14 +1,28 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "hello world",
+	router.LoadHTMLGlob("templates/*")
+
+	router.GET("/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"title": "Home Page",
+		})
+	})
+	router.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.tmpl", gin.H{
+			"title": "User Login",
 		})
 	})
 	// define port `r.Run(":8080")`
-	router.Run()
+	fmt.Println("server started on :8080")
+	log.Fatal(router.Run(":8080"))
 }
