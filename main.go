@@ -2,32 +2,35 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
+
+	globals "home-owner/globals"
+	middleware "home-owner/middleware"
+	routes "home-owner/routes"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 
 	"github.com/gin-gonic/gin"
 )
 
-func routes() {
-	router := gin.Default()
-	router.LoadHTMLGlob("templates/*")
+func main() {
+	gin.SetMode(gin.ReleaseMode)
 
-	router.GET("/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "Home Page",
-		})
-	})
-	router.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"title": "User Login",
-		})
-	})
+	router := gin.Default()
+
+	router.Static("/assets", "./assets")
+	router.LoadHTMLGlob("templates/*.html")
+
+	router.Use(sessions.Sessions("session", cookie.NewStore(globals.Secret)))
+
+	public := router.Group("/")
+	routes.PublicRoutes(public)
+
+	private := router.Group("/")
+	private.Use(middleware.Auth)
+	routes.PrivateRoutes(private)
 
 	fmt.Println("server started on :8080")
 	// define port `r.Run(":8080")`
-	log.Fatal(router.Run(":8080"))
-}
-
-func main() {
-	routes()
+	router.Run(":8080")
 }
